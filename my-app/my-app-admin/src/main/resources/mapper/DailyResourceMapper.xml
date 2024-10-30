@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.DailyResourceMapper">
+
+    <resultMap id="BaseResultMap" type="com.po.DailyResourcePO">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="water" column="water" jdbcType="INTEGER"/>
+            <result property="food" column="food" jdbcType="INTEGER"/>
+            <result property="tent" column="tent" jdbcType="INTEGER"/>
+            <result property="car" column="car" jdbcType="INTEGER"/>
+            <result property="boat" column="boat" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,water,food,
+        tent,car,boat
+    </sql>
+</mapper>

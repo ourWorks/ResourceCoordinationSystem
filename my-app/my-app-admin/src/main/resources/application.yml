@@ -1,0 +1,62 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: my-app
+  profiles:
+    active: prod
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://10.1.1.102:3306/my-app-data?serverTimezone=Asia/Shanghai&characterEncoding=utf8
+    url: jdbc:mysql://localhost:3307/my-app-data?serverTimezone=Asia/Shanghai&characterEncoding=utf8
+#    url: jdbc:mysql://localhost:3306/my-app-data?serverTimezone=UTC&characterEncoding=utf8
+    username: root
+    password: 123456
+  redis:
+#    host: 10.1.1.102 # Redis服务器地址
+    host: localhost # Redis服务器地址
+    database: 0 # Redis数据库索引（默认为0）
+    port: 6379 # Redis服务器连接端口
+    password: # Redis服务器连接密码（默认为空）
+    jedis:
+      pool:
+        max-active: 8 # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: -1ms # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 8 # 连接池中的最大空闲连接
+        min-idle: 0 # 连接池中的最小空闲连接
+    timeout: 3000ms # 连接超时时间（毫秒）
+  devtools:
+    livereload:
+      port: 35730
+  mybatis:
+    mapper-locations: classpath:mapp/*.xml
+    type-aliases-package: com.po
+  mail:
+    host: smtp.qq.com
+    ##邮箱用户名,qq邮箱密码要使用独立密码
+    username: ourWorks@qq.com
+    password: pwbnphvqqzgdbdbc
+    default-encoding: UTF-8
+    ##发送邮箱地址
+mail:
+  fromMail.sender: ourWorks@qq.com
+  fromMail.receiver: SuXiaolong20000307@hotmail.com
+
+#  rabbitmq:
+#    host: localhost # rabbitmq的连接地址
+#    port: 5672 # rabbitmq的连接端口号
+#    virtual-host: /xiao # rabbitmq的虚拟host
+#    username: Xiaolong # rabbitmq的用户名
+#    password: 20000307 # rabbitmq的密码
+#    publisher-confirm-type: correlated #如果对异步消息需要回调必须设置为correlated 新版本的用法
+#  #    publisher-confirms: true #如果对异步消息需要回调必须设置为true
+logging:
+  level:
+    root: info
+    com: debug
+swagger:
+  production: false
+  basic:
+    enable: true
+    username: root
+    password: root

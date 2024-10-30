@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.CitizenMapper">
+
+    <resultMap id="BaseResultMap" type="com.po.CitizenPO">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="idCard" column="idCard" jdbcType="VARCHAR"/>
+            <result property="phone" column="phone" jdbcType="VARCHAR"/>
+            <result property="password" column="password" jdbcType="VARCHAR"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="age" column="age" jdbcType="INTEGER"/>
+            <result property="gender" column="gender" jdbcType="VARCHAR"/>
+            <result property="deleteState" column="deleteState" jdbcType="INTEGER"/>
+            <result property="email" column="email" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,idCard,phone,
+        password,name,age,
+        gender,deleteState,email,
+        img
+    </sql>
+
+    <!--添加的语句-->
+    <select id="selectOneByPhoneOrEmailOrIdCard" resultType="com.po.CitizenPO">
+        select *
+        from citizen
+        where phone = #{phone}
+           or email = #{email}
+           or idCard = #{idCard};
+    </select>
+    <select id="verify" resultType="com.po.CitizenPO">
+        select *
+        from citizen
+        where (phone = #{phone} or email = #{email} or idCard = #{idCard})
+          and password = #{password};
+    </select>
+    <select id="getCitizenNum" resultType="java.lang.Integer">
+        select count(*) from citizen where deleteState=0
+    </select>
+
+</mapper>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.OrganizationMapper">
+
+    <resultMap id="BaseResultMap" type="com.po.OrganizationPO">
+        <id property="orgId" column="orgId" jdbcType="BIGINT"/>
+        <result property="orgName" column="orgName" jdbcType="VARCHAR"/>
+        <result property="longitude" column="longitude" jdbcType="FLOAT"/>
+        <result property="latitude" column="latitude" jdbcType="FLOAT"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="deleteState" column="deleteState" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        orgId
+        ,orgName,longitude,
+        latitude,address,deleteState
+    </sql>
+
+<!--    &#45;&#45; desc order 就是倒序展示，已经排好班的放到前面-->
+    <select id="findArrangeList" resultType="com.vo.ArrangeVO">
+        SELECT *
+        FROM (
+                 SELECT volunteerId,
+                        NAME  AS volunteer_name,
+                        phone AS volunteer_phone,
+                        ondueState
+                 FROM volunteer
+                          INNER JOIN citizen USING (id)
+                 WHERE volunteer.deleteState = 0
+                   AND id IN (SELECT id FROM volunteer WHERE orgId = #{orgId})) AS table_org_volunteer
+                 LEFT JOIN (
+            SELECT volunteerId,
+                   NAME            AS citizen_name,
+                   call_help.phone AS citizen_phone,
+                   deadline AS time,
+		           state,
+                   cid
+            FROM
+                call_help
+                INNER JOIN citizen USING ( id )
+            WHERE
+                state NOT IN ( "已完成"
+                , "待救援" )
+        ) AS table_citizen_call
+        USING (volunteerId) order by citizen_name DESC,volunteer_name
+    </select>
+    <select id="findAddArrangeByStr" resultType="com.vo.ArrangeVO">
+        SELECT *
+        FROM (
+        SELECT volunteerId,
+        NAME AS volunteer_name,
+        phone AS volunteer_phone,
+        ondueState
+        FROM volunteer
+        INNER JOIN citizen USING (id)) AS table_org_volunteer
+        INNER JOIN (
+        SELECT volunteerId,
+        NAME AS citizen_name,
+        call_help.phone AS citizen_phone,
+        deadline AS time,
+        state,
+        cid
+        FROM
+        call_help
+        INNER JOIN citizen USING ( id )
+        WHERE
+        call_help.cid in
+            (${cidStr})
+        ) AS table_citizen_call
+        USING (volunteerId)
+    </select>
+
+    <!--    &lt;!&ndash;    根据传入的cid列表来查询新安排的数据&ndash;&gt;-->
+    <!--    <select id="findAddArrangeList" parameterType="java.util.List" resultType="com.vo.ArrangeVO">-->
+    <!--        SELECT *-->
+    <!--        FROM (-->
+    <!--        SELECT volunteerId,-->
+    <!--        NAME AS volunteer_name,-->
+    <!--        phone AS volunteer_phone,-->
+    <!--        ondueState-->
+    <!--        FROM volunteer-->
+    <!--        INNER JOIN citizen USING (id)) AS table_org_volunteer-->
+    <!--        INNER JOIN (-->
+    <!--        SELECT volunteerId,-->
+    <!--        NAME AS citizen_name,-->
+    <!--        call_help.phone AS citizen_phone,-->
+    <!--        deadline AS time,-->
+    <!--        state,-->
+    <!--        cid-->
+    <!--        FROM-->
+    <!--        call_help-->
+    <!--        INNER JOIN citizen USING ( id )-->
+    <!--        WHERE-->
+    <!--        call_help.cid in-->
+    <!--        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">-->
+    <!--            #{item}-->
+    <!--        </foreach>-->
+    <!--&#45;&#45;         (2,4,7,1506692678165770242)-->
+    <!--        ) AS table_citizen_call-->
+    <!--        USING (volunteerId)-->
+    <!--    </select>-->
+</mapper>

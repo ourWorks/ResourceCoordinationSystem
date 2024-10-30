@@ -1,0 +1,69 @@
+package com.algorithm;/*
+ *@program:my-app
+ *@author: 苏晓龙
+ */
+
+import com.dto.VolunteerInfoDTO;
+import com.po.ArrangePO;
+import com.po.CallHelpPO;
+import com.vo.ArrangeVO;
+import org.springframework.stereotype.Component;
+import java.util.ArrayList;
+import java.util.List;
+
+@Component
+public class PositionStrategy extends Strategy {
+
+//    比如下面的小数点百分位之间相差二，那么就粗略地认为两点之间的位置在5公里以内
+//    23.2 0 726865，113.3 7 092210
+//    23.1 9 399544，113.3 9 042118
+    @Override
+    List<ArrangeVO> arrange(ArrangePO arrangePO) {
+        //需要用来排班的两个通用对象
+        List<VolunteerInfoDTO> availableVolunteers = arrangeMapper.getAvailableVolunteers(arrangePO);
+        List<CallHelpPO> allWaitingTask = callHelpMapper.getAllWaitingTask();
+        //新添加的排班
+        List<Long> cidList = new ArrayList<>();
+        //要返回的dataList
+        List<ArrangeVO> dataList = null;
+        VolunteerInfoDTO volunteer;
+        CallHelpPO callHelp;
+        //代表当前志愿者已被分配一个任务，如果放在循环里面就会失效：!callHelp.getState().equals("已分配")不生效，
+        boolean notArranged = true;
+        for (int i = 0; i < availableVolunteers.size(); i++, notArranged = true) {
+            //一个可以被安排志愿者的信息集合
+            volunteer = availableVolunteers.get(i);
+            for (int j = 0; j < allWaitingTask.size() && notArranged; j++) {
+                //一条可以被安排的求助表单
+                callHelp = allWaitingTask.get(j);
+
+                //////////////////////////////////////////////////////Position////////////////////////////////////////////////////////////////////
+                //位置吻合：在五公里以内
+                boolean longitudeFlag = Math.abs(volunteer.getLongitude() - callHelp.getLongitude()) <= 0.02 ? true : false;
+                boolean latitudeFlag = Math.abs(volunteer.getLatitude() - callHelp.getLatitude()) <= 0.02 ? true : false;
+                //位置在约5公里以内
+                if (!callHelp.getState().equals("已分配")
+                        && longitudeFlag
+                        && latitudeFlag
+                )
+                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                {
+                    //
+                    callHelp.setState("已分配");
+                    callHelp.setVolunteerId(volunteer.getVolunteerId());
+                    callHelpService.updateById(callHelp);
+                    //退出内层循环，就是这个志愿者已经被安排过了,他不用继续匹配下一个求助表单
+                    notArranged = false;
+                    //记录一下修改过的
+                    cidList.add(callHelp.getCid());
+                }
+            }
+        }
+        //调用一下接口，筛选一下新增加的
+        if (cidList.size() > 0) {
+            String preStr = cidList.toString();
+            dataList = organizationMapper.findAddArrangeByStr(preStr.substring(1, preStr.length() - 1));
+        }
+        return dataList;
+    }
+}

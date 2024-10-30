@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.CallHelpMapper">
+
+    <resultMap id="BaseResultMap" type="com.po.CallHelpPO">
+            <id property="cid" column="cid" jdbcType="BIGINT"/>
+            <result property="id" column="id" jdbcType="BIGINT"/>
+            <result property="volunteerId" column="volunteerId" jdbcType="BIGINT"/>
+            <result property="callTime" column="callTime" jdbcType="TIMESTAMP"/>
+            <result property="deadline" column="deadline" jdbcType="TIMESTAMP"/>
+            <result property="longitude" column="longitude" jdbcType="FLOAT"/>
+            <result property="latitude" column="latitude" jdbcType="FLOAT"/>
+            <result property="ip" column="ip" jdbcType="VARCHAR"/>
+            <result property="phone" column="phone" jdbcType="VARCHAR"/>
+            <result property="peopleNum" column="peopleNum" jdbcType="INTEGER"/>
+            <result property="state" column="state" jdbcType="VARCHAR"/>
+            <result property="dailyResource" column="dailyResource" jdbcType="VARCHAR"/>
+            <result property="medicalResource" column="medicalResource" jdbcType="VARCHAR"/>
+            <result property="comment" column="comment" jdbcType="VARCHAR"/>
+            <result property="deleteState" column="deleteState" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        cid,id,callTime,
+        deadline,longitude,latitude,
+        ip,phone,peopleNum,
+        state,dailyResource,medicalResource,
+        comment,deleteState
+    </sql>
+<!--    关于not id：自己发出的求救任务不能自己领取-->
+    <select id="getWaitingOrArrangedTask" resultType="com.po.CallHelpPO">
+        select * from call_help where deleteState=0 and state in ("待救援") and not id=#{id}
+    </select>
+
+    <select id="myVolunteerTask" resultType="com.po.CallHelpPO">
+        select * from call_help where deleteState=0 and state in ("救援中","已分配","已完成") and volunteerId=#{volunteerId}
+    </select>
+    <select id="getAllWaitingTask" resultType="com.po.CallHelpPO">
+        select * from call_help where deleteState=0 and state in ("待救援")
+    </select>
+    <select id="getDaiJiuYuan" resultType="java.lang.Integer">
+        select count(*) from call_help where deleteState=0 and state="待救援"
+    </select>
+    <select id="getYiFenPei" resultType="java.lang.Integer">
+        select count(*) from call_help where deleteState=0 and state="已分配"
+    </select>
+    <select id="getJiuYuanZhong" resultType="java.lang.Integer">
+        select count(*) from call_help where deleteState=0 and state="救援中"
+    </select>
+    <select id="getYiWanCheng" resultType="java.lang.Integer">
+        select count(*) from call_help where deleteState=0 and state="已完成"
+    </select>
+</mapper>

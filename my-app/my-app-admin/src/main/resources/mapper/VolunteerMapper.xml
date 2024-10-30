@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.VolunteerMapper">
+
+    <resultMap id="BaseResultMap" type="com.po.VolunteerPO">
+        <id property="volunteerId" column="volunteerId" jdbcType="BIGINT"/>
+        <result property="id" column="id" jdbcType="BIGINT"/>
+        <result property="longitude" column="longitude" jdbcType="FLOAT"/>
+        <result property="latitude" column="latitude" jdbcType="FLOAT"/>
+        <result property="orgId" column="orgId" jdbcType="BIGINT"/>
+        <result property="ondueState" column="ondueState" jdbcType="VARCHAR"/>
+        <result property="deleteState" column="deleteState" jdbcType="INTEGER"/>
+        <result property="startTime" column="startTime" jdbcType="TIME"/>
+        <result property="endTime" column="endTime" jdbcType="TIME"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        volunteerId
+        ,id,longitude,
+        latitude,orgId,ondueState,
+        deleteState,startTime,endTime
+    </sql>
+    <update id="markDeleteState">
+        update volunteer set deleteState=1 where orgId=#{orgId} and id=#{id}
+    </update>
+    <!--    <select id="findPage" resultType="com.po.VolunteerPO">-->
+    <!--        select * from volunteer where id>=(select id from volunteer limit #{pageNum},1) limit 1;-->
+    <!--    </select>-->
+
+    <select id="findOrgVolunteers" resultType="com.vo.VolunteerVO">
+--         select *
+--         from citizen
+--         where id >= (select id from citizen limit 24, 1) limit 8;
+        SELECT orgId,
+               citizen.id,
+               volunteerId,
+               name,
+               age,
+               gender,
+               phone,
+               email,
+               longitude,
+               latitude,
+               ondueState,
+               startTime,
+               endTime
+        from citizen
+                 INNER JOIN volunteer on citizen.id = volunteer.id and orgId = #{orgId} and citizen.deleteState = 0 and
+                                         volunteer.deleteState = 0
+    </select>
+    <select id="getVolunteerNum" resultType="java.lang.Integer">
+        select count(*) from volunteer where deleteState=0
+    </select>
+</mapper>

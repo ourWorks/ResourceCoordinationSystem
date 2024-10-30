@@ -1,0 +1,2 @@
+webpackJsonp([4],{QaVf:function(e,n){},XB6K:function(e,n,t){"use strict";Object.defineProperty(n,"__esModule",{value:!0});var r={render:function(){var e=this.$createElement;return(this._self._c||e)("div",[this._v("\n  组织监督\n")])},staticRenderFns:[]};var a=t("e/h9")({name:"org_supervise"},r,!1,function(e){t("QaVf")},"data-v-e25b7e80",null);n.default=a.exports}});
+//# sourceMappingURL=4.b08d71d8e80d416c2eb8.js.map

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.MedicalResourceMapper">
+
+    <resultMap id="BaseResultMap" type="com.po.MedicalResourcePO">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="mask" column="mask" jdbcType="INTEGER"/>
+            <result property="bandage" column="bandage" jdbcType="INTEGER"/>
+            <result property="stretcher" column="stretcher" jdbcType="INTEGER"/>
+            <result property="depressor" column="depressor" jdbcType="INTEGER"/>
+            <result property="antihistamine" column="antihistamine" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,mask,bandage,
+        stretcher,depressor,antihistamine
+    </sql>
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.ArrangeMapper">
+
+    <resultMap id="BaseResultMap" type="com.po.ArrangePO">
+        <id property="orgId" column="orgId" jdbcType="BIGINT"/>
+        <result property="id" column="id" jdbcType="BIGINT"/>
+        <result property="strategy" column="strategy" jdbcType="VARCHAR"/>
+        <result property="arrangeTime" column="arrangeTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        orgId
+        ,id,strategy,
+        arrangeTime
+    </sql>
+    <select id="showOrgResource" resultType="com.vo.OrgResourceVO">
+        (SELECT *
+         FROM (SELECT id, ondueState
+               FROM organization
+                        INNER JOIN volunteer USING (orgId, deleteState)
+               WHERE deleteState = 0
+                 and orgId = #{orgId}) AS t_org_volunteer
+                  INNER JOIN
+              (
+                  SELECT *
+                  FROM medical_resource
+                           INNER JOIN daily_resource USING (id)) AS t_resource
+              USING (id))
+    </select>
+<!--    &#45;&#45; 筛选出本组织未删除的，状态在“值班”或“空闲”的志愿者及其可以用来进一步安排的三个纬度的信息-->
+<!--    &#45;&#45; 	已经存在“被分配”任务的志愿者就不要再次分配了-->
+    <select id="getAvailableVolunteers" resultType="com.dto.VolunteerInfoDTO">
+        -- 筛选出本组织未删除的，状态在“值班”或“空闲”的志愿者及其可以用来进一步安排的三个纬度的信息
+        SELECT
+            *
+        FROM
+            volunteer
+                LEFT JOIN (
+                SELECT
+                    *
+                FROM
+                    medical_resource
+                        INNER JOIN daily_resource USING ( id )) AS resource_table USING ( id )
+        WHERE
+            ondueState IN ( "值班", "空闲" )
+          AND orgId = #{orgId}
+          -- 	已经存在“被分配”任务的志愿者就不要再次分配了
+          AND volunteerId NOT IN ( SELECT volunteerId FROM call_help INNER JOIN volunteer USING ( volunteerId ) WHERE state = "已分配" )
+    </select>
+</mapper>
